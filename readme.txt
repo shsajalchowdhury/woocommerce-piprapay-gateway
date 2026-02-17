@@ -4,7 +4,7 @@ Tags: payment, gateway, WooCommerce, piprapay
 Tested up to: 6.8
 WC requires at least: 3.0
 WC tested up to: 8.0
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,11 +16,11 @@ PipraPay Gateway provides an easy, secure, and reliable way to accept payments o
 
 - Integration with the PipraPay API
 - Customizable payment settings
-- Configurable checkout logo (new in 1.2.4)
+- Configurable checkout logo
 - Secure webhook handling
 - Order payment verification
 - Compatibility with WooCommerce High-Performance Order Storage (HPOS)
-- Compatibility with WooCommerce block-based checkout (new in 1.2.5)
+- Compatibility with WooCommerce block-based checkout
 
 Supported Gateways:
 
@@ -53,7 +53,7 @@ PipraPay is a secure payment gateway that supports multiple currencies and payme
 Go to **WooCommerce > Settings > Payments** and click on "Manage" under PipraPay Gateway.
 
 = Can I customize the checkout logo? =
-Yes, as of version 1.2.4, administrators can set a custom logo URL or upload an image via the media library.
+Yes, administrators can set a custom logo URL or upload an image via the media library.
 
 = Is my data secure? =
 Yes, all payment data is processed securely through the PipraPay API.
@@ -62,7 +62,7 @@ Yes, all payment data is processed securely through the PipraPay API.
 Yes, this plugin is fully compatible with WooCommerce High-Performance Order Storage (HPOS).
 
 = Does this plugin support WooCommerce block-based checkout? =
-Yes, as of version 1.2.5, the plugin supports WooCommerce block-based checkout, ensuring a seamless experience in the modern checkout flow.
+Yes, the plugin supports WooCommerce block-based checkout, ensuring a seamless experience in the modern checkout flow.
 
 == External Services ==
 
@@ -90,6 +90,12 @@ For more information, please review the PipraPay:
 = 1.0.2 =
 * Fixed issue where pending orders incorrectly moved to failed status
 
+= 1.0.3 =
+* Added support for PipraPay 3.0.0
+* Show / Hide icon option on checkout page
+* Direct Settings link from the Plugins page
+* Automatic order status handling for Digital Products (set to Processing)
+
 == Upgrade Notice ==
 
 = 1.0.0 =
@@ -101,3 +107,9 @@ Include Supported Gateways
 
 = 1.0.2 =
 Fixed issue where pending orders incorrectly moved to failed status
+
+= 1.0.3 =
+- Added support for PipraPay 3.0.0
+- Show / Hide icon option on checkout page
+- Direct Settings link from the Plugins page
+- Automatic order status handling for Digital Products (set to Processing)
