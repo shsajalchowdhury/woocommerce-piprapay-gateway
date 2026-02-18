@@ -4,7 +4,7 @@ Tags: payment, gateway, WooCommerce, piprapay
 Tested up to: 6.8
 WC requires at least: 3.0
 WC tested up to: 8.0
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -96,6 +96,11 @@ For more information, please review the PipraPay:
 * Direct Settings link from the Plugins page
 * Automatic order status handling for Digital Products (set to Processing)
 
+= 1.0.4 =
+* Added dynamic order currency support for all PipraPay versions
+* Fixed URL whitelist issue in V3+
+* Resolved minor bugs and improvements
+
 == Upgrade Notice ==
 
 = 1.0.0 =
@@ -113,3 +118,8 @@ Fixed issue where pending orders incorrectly moved to failed status
 - Show / Hide icon option on checkout page
 - Direct Settings link from the Plugins page
 - Automatic order status handling for Digital Products (set to Processing)
+
+= 1.0.4 =
+- Added dynamic order currency support for all PipraPay versions
+- Fixed URL whitelist issue in V3+
+- Resolved minor bugs and improvements

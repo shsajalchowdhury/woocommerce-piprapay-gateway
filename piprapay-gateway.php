@@ -4,7 +4,7 @@
  * Plugin URI: https://piprapay.com
  * Description: A seamless and secure payment gateway integration for WooCommerce using PipraPay.
  * Author: PipraPay
- * Version: 1.0.3
+ * Version: 1.0.4
  * Requires at least: 5.2
  * Requires PHP: 7.4
  * WC requires at least: 3.0
@@ -52,7 +52,6 @@ function piprapay_init_gateway_class()
         public $apikey;
         public $baseUrl;
         public $order_type;
-        public $currency;
         public $piprapay_version;
 
         public static function get_instance()
@@ -88,7 +87,6 @@ function piprapay_init_gateway_class()
             $this->apikey = sanitize_text_field($this->get_option('apikey'));
             $this->baseUrl = sanitize_text_field($this->get_option('baseUrl'));
             $this->order_type = sanitize_text_field($this->get_option('order_type'));
-            $this->currency = sanitize_text_field($this->get_option('currency'));
             $this->piprapay_version = sanitize_text_field($this->get_option('piprapay_version'));
             
             add_action('woocommerce_update_options_payment_gateways_' . $this->id, [$this, 'process_admin_options']);
@@ -169,13 +167,6 @@ function piprapay_init_gateway_class()
                     'default' => '',
                     'desc_tip' => true,
                 ],
-                'currency' => [
-                    'title' => __('Default Currency', 'piprapay-gateway'),
-                    'type' => 'text',
-                    'description' => __('The currency you want to show on gateway.', 'piprapay-gateway'),
-                    'default' => 'USD',
-                    'desc_tip' => true,
-                ],
             ];
         }
 
@@ -197,7 +188,7 @@ function piprapay_init_gateway_class()
                     'cancel_url'   => wc_get_checkout_url(),
                     'webhook_url'  => WC()->api_request_url(strtolower($this->id)),
                     'return_type'  => 'POST',
-                    'currency'     => $this->currency,
+                    'currency'     => $order->get_currency(),
                 ];
             
                 $args = [
@@ -230,16 +221,18 @@ function piprapay_init_gateway_class()
                 wc_add_notice(sprintf(__('Payment error: Unable to create payment link. %s', 'piprapay-gateway'), $message), 'error');
                 return ['result' => 'fail'];
             }else{
+                $new_url = preg_replace('/(https?:\/\/)www\./i', '$1', WC()->api_request_url(strtolower($this->id)));
+                
                 $data = [
                     'full_name'    => sanitize_text_field(trim(($order->get_billing_first_name() . ' ' . $order->get_billing_last_name()) ?: 'Jhon')),
                     'email_address' => sanitize_email($order->get_billing_email() ?: 'jhon@gmail.com'),
                     'mobile_number' => sanitize_text_field($order->get_billing_phone() ?: '01700000000'),
                     'amount'       => $order->get_total(),
                     'metadata'     => ['invoiceid' => $order->get_id()],
-                    'return_url' => WC()->api_request_url(strtolower($this->id)),
-                    'webhook_url'  => WC()->api_request_url(strtolower($this->id)),
+                    'return_url' => $new_url,
+                    'webhook_url'  => $new_url,
                     'return_type'  => 'POST',
-                    'currency'     => $this->currency,
+                    'currency'     => $order->get_currency(),
                 ];
             
                 $args = [
@@ -403,6 +396,12 @@ function piprapay_init_gateway_class()
                     }
                     $order->payment_complete();
                     $order->add_order_note(__('Payment verified via PipraPay.', 'piprapay-gateway'));
+
+                    if (empty($payload['metadata']['invoiceid']) || empty($payload['pp_id'])) {
+                        status_header(200);
+                      
+                        wp_safe_redirect($order->get_checkout_order_received_url());
+                    }
                 } else {
                     if ($verification['status'] === 'pending') {
                         $order->add_order_note(__('Payment verification is pending.', 'piprapay-gateway'));
