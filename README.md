@@ -62,3 +62,22 @@ For more information, please review:
 
 ### 1.0.0
 - Initial release
+
+### 1.0.1
+- Fixed order status update issue
+- Included supported gateways
+
+### 1.0.2
+- Fixed issue where pending orders incorrectly moved to failed status
+
+### 1.0.3
+- Added support for PipraPay 3.0.0
+- Show / hide icon option on checkout page
+- Direct settings link from the Plugins page
+- Automatic order status handling for digital products (set to Processing)
+
+### 1.0.4
+- Added dynamic order currency support for all PipraPay versions
+- Fixed URL whitelist issue in V3+
+- Resolved minor bugs and improvements
+
