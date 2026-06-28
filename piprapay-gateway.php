@@ -4,7 +4,7 @@
  * Plugin URI: https://piprapay.com
  * Description: A seamless and secure payment gateway integration for WooCommerce using PipraPay.
  * Author: PipraPay
- * Version: 1.0.5
+ * Version: 1.0.6
  * Requires at least: 5.2
  * Requires PHP: 7.4
  * WC requires at least: 3.0
@@ -261,7 +261,8 @@ function piprapay_init_gateway_class()
             $order_total   = (float) $order->get_total();
             $verified_total = 0;
 
-            // The verification response may contain 'total' or 'amount'
+            // PipraPay returns 'total' (after fees/discounts) and 'amount' (base).
+            // The WC order total includes everything, so prefer 'total'.
             if (isset($verification['total'])) {
                 $verified_total = (float) $verification['total'];
             } elseif (isset($verification['amount'])) {
@@ -277,6 +278,26 @@ function piprapay_init_gateway_class()
             $tolerance = 0.01;
 
             return abs($order_total - $verified_total) <= $tolerance;
+        }
+
+        /**
+         * Verify that the payment currency matches the order currency.
+         *
+         * @since 1.0.6
+         * @param WC_Order $order The WooCommerce order object.
+         * @param array    $verification The verification response from PipraPay.
+         * @return bool True if currencies match, false otherwise.
+         */
+        private function verify_payment_currency($order, $verification)
+        {
+            $order_currency = $order->get_currency();
+            $verified_currency = isset($verification['currency']) ? $verification['currency'] : '';
+
+            if (empty($verified_currency)) {
+                return false;
+            }
+
+            return strtoupper($order_currency) === strtoupper($verified_currency);
         }
 
         public function process_payment($order_id)
@@ -440,6 +461,17 @@ function piprapay_init_gateway_class()
                         exit;
                     }
 
+                    // ============================================================
+                    // SECURITY FIX (v1.0.6): Verify currency matches to prevent
+                    // cross-currency payment bypass (e.g. pay in USD for BDT).
+                    // ============================================================
+                    if (!$this->verify_payment_currency($order, $verification)) {
+                        $order->update_status('failed', __('Payment currency verification failed: currency does not match order.', 'piprapay-gateway'));
+                        status_header(400);
+                        wp_send_json_error(['message' => 'Currency mismatch.']);
+                        exit;
+                    }
+
                     // Save Payment ID (pp_id)
                     $order->update_meta_data('_piprapay_payment_id', $pp_id);
 
@@ -533,6 +565,17 @@ function piprapay_init_gateway_class()
                         $order->update_status('failed', __('Payment amount verification failed: paid amount does not match order total.', 'piprapay-gateway'));
                         status_header(400);
                         wp_send_json_error(['message' => 'Amount mismatch.']);
+                        exit;
+                    }
+
+                    // ============================================================
+                    // SECURITY FIX (v1.0.6): Verify currency matches to prevent
+                    // cross-currency payment bypass.
+                    // ============================================================
+                    if (!$this->verify_payment_currency($order, $verification)) {
+                        $order->update_status('failed', __('Payment currency verification failed: currency does not match order.', 'piprapay-gateway'));
+                        status_header(400);
+                        wp_send_json_error(['message' => 'Currency mismatch.']);
                         exit;
                     }
 

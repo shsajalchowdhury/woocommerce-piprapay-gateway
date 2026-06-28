@@ -4,7 +4,7 @@ Tags: payment, gateway, WooCommerce, piprapay
 Tested up to: 6.8
 WC requires at least: 3.0
 WC tested up to: 8.0
-Stable tag: 1.0.5
+Stable tag: 1.0.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
